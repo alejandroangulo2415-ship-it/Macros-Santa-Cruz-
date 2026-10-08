@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facción Médica — Santa Cruz</title>
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:linear-gradient(135deg,#061b13,#0b3d2e 55%,#06261c);
+    color:#fff;
+    min-height:100vh;
+}
+header{
+    padding:38px 20px 28px;
+    text-align:center;
+    background:rgba(0,0,0,.22);
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+.logo{
+    width:72px;height:72px;margin:auto auto 12px;
+    border-radius:22px;
+    display:flex;align-items:center;justify-content:center;
+    background:#16a34a;
+    font-size:36px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+h1{margin:0;font-size:28px}
+.subtitle{margin:8px 0 0;color:#b7e4cb}
+.container{max-width:900px;margin:auto;padding:22px 15px 50px}
+.search{
+    width:100%;padding:15px 17px;border:0;border-radius:14px;
+    background:#ffffff12;color:white;outline:none;
+    border:1px solid #ffffff18;font-size:15px;margin-bottom:15px;
+}
+.search::placeholder{color:#a9c7b8}
+.categories{
+    display:flex;gap:8px;overflow-x:auto;padding-bottom:16px;
+}
+.categories button{
+    flex:0 0 auto;border:1px solid #ffffff18;background:#ffffff0d;
+    color:#d9f5e4;padding:10px 14px;border-radius:999px;cursor:pointer;
+}
+.categories button.active,.categories button:hover{
+    background:#16a34a;border-color:#16a34a;color:white;
+}
+.section-title{font-size:18px;margin:10px 0 14px;color:#dff7e8}
+.card{
+    display:flex;gap:14px;align-items:center;
+    padding:17px;margin-bottom:12px;
+    background:rgba(255,255,255,.075);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;
+    backdrop-filter:blur(8px);
+}
+.message{flex:1;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.tag{
+    display:inline-block;font-size:11px;font-weight:bold;
+    color:#a7f3c1;background:#14532d;padding:4px 8px;
+    border-radius:6px;margin-bottom:7px;
+}
+.copy{
+    flex:0 0 auto;border:0;background:#16a34a;color:white;
+    font-weight:bold;padding:11px 15px;border-radius:10px;
+    cursor:pointer;transition:.2s;
+}
+.copy:hover{background:#22c55e;transform:translateY(-1px)}
+.copy.done{background:#15803d}
+.empty{text-align:center;color:#9fb8aa;padding:30px}
+footer{text-align:center;color:#719586;font-size:12px;padding:0 15px 30px}
+@media(max-width:560px){
+    .card{align-items:stretch;flex-direction:column}
+    .copy{width:100%}
+    h1{font-size:23px}
+}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">🏥</div>
+    <h1>Facción Médica</h1>
+    <p class="subtitle">Santa Cruz · Centro de mensajes</p>
+</header>
+
+<main class="container">
+    <input id="search" class="search" type="search" placeholder="🔎 Buscar un mensaje...">
+
+    <div class="categories">
+        <button class="active" data-cat="Todos">Todos</button>
+        <button data-cat="Atención">🚑 Atención</button>
+        <button data-cat="RCP">❤️ RCP</button>
+        <button data-cat="RP">🎭 RP</button>
+        <button data-cat="MDS">📜 MDS</button>
+        <button data-cat="Comunicados">📢 Comunicados</button>
+    </div>
+
+    <div class="section-title">📋 Mensajes disponibles</div>
+    <div id="messages"></div>
+</main>
+
+<footer>
+    Facción Médica · Santa Cruz
+</footer>
+
+<script>
+const mensajes = [
+    {
+        categoria:"MDS",
+        texto:`***ONESTATE***
+¡Hola, miembros de la Facción de la Alianza Médica!
+Aquí están las reglas y los castigos para los médicos.
+Por favor, léanlos atentamente y recuerden siempre que ser médico no es una tarea sencilla y requiere que aprendan bien las reglas.
+
+# Reglas de la Alianza de Médicos <:medsalute:1346812421309730826>`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.1 MD1 - Negativa a Proporcionar Asistencia Médica
+Negarse a administrar medicamentos a civiles o a reanimar a una persona sin una razón justificada de RP, siempre que no exista peligro para la vida del médico. (Guerra Territorial, Tiroteo Activo, Enfrentamiento)
+Castigo: 1 reprimenda.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.2 MD2 - Uso de Armas de Fuego
+El uso de armas de fuego por parte del personal médico está estrictamente prohibido.
+Castigo: Expulsión de la facción.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.3 MD3 - Cumplimiento de las Reglas del Proyecto
+Los miembros de la facción médica deben seguir todas las reglas del proyecto establecidas.
+Castigo: de 1 advertencia a 1 reprimenda.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.4 MD4 - Uso de Vehículos Oficiales para Actividades Personales
+El uso personal de vehículos médicos oficiales está prohibido.
+Castigo: 1 reprimenda.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.5 MD5 - Emisión de Certificados Médicos
+Está prohibido emitir certificados médicos fuera del ámbito hospitalario.
+Castigo: 1 advertencia.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.6 MD6 - Acciones Médicas en Situaciones Peligrosas
+Está prohibido vender medicamentos o reanimar a jugadores durante situaciones que pongan en peligro la vida, como tiroteos u otras amenazas activas (incluso para la persona que recibe tratamiento).
+Castigo: 1 advertencia.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.7 MD7 - Asociación con Pandillas y Actividad Delictiva
+Está prohibido asociarse intencionalmente con pandillas, cometer delitos graves (p. ej., robo, vandalismo, asesinato) o afiliarse a facciones durante eventos.
+Castigo: Expulsión de la facción.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.8 MD8 - Conducta irrespetuosa hacia colegas y civiles
+Se prohíbe la conducta irrespetuosa hacia cualquier persona.
+Castigo: 1 reprimenda o despido, según la decisión del liderazgo de la facción.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.9 MD9 - Incumplimiento de órdenes
+No seguir órdenes ni observar la subordinación basada en el rango.
+Castigo: 1 reprimenda.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.10 MD10 - Uso de vehículos personales para tareas de SEM
+No se permite el uso de vehículos personales para tareas relacionadas con SEM.
+Castigo: 1 advertencia.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.11 MD11 - Conducta adecuada en el juego de roles
+El personal médico debe representar sus funciones de forma adecuada, incluyendo interacciones, diálogos (por ejemplo, anunciar asistencia) y la inspección del entorno durante emergencias.
+Castigo: 1 advertencia.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.12 MD12 - Uso indebido de pistolas Taser
+Atacar a civiles con una pistola Taser, un arma o fuerza física sin justificación para la RP.
+Castigo: Expulsión de la facción.`
+    },
+    {
+        categoria:"MDS",
+        texto:`10.13 RP16 - Actos delictivos contra el personal de emergencias
+Se prohíbe cualquier acto delictivo contra el personal médico de emergencias.
+Castigo: Desde 90 minutos de cárcel en ONESTATE hasta 12 horas de Ban.`
+    }
+];
+
+let categoriaActual = "Todos";
+
+const contenedor = document.getElementById("messages");
+const buscador = document.getElementById("search");
+
+function mostrarMensajes(){
+    const busqueda = buscador.value.toLowerCase().trim();
+
+    const filtrados = mensajes.filter(m => {
+        const coincideCategoria =
+            categoriaActual === "Todos" || m.categoria === categoriaActual;
+
+        const coincideBusqueda =
+            m.texto.toLowerCase().includes(busqueda) ||
+            m.categoria.toLowerCase().includes(busqueda);
+
+        return coincideCategoria && coincideBusqueda;
+    });
+
+    contenedor.innerHTML = "";
+
+    if(!filtrados.length){
+        contenedor.innerHTML = '<div class="empty">No se encontraron mensajes.</div>';
+        return;
+    }
+
+    filtrados.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const contenido = document.createElement("div");
+        contenido.className = "message";
+        contenido.innerHTML =
+            `<span class="tag">${m.categoria}</span><br>` +
+            escapeHTML(m.texto);
+
+        const boton = document.createElement("button");
+        boton.className = "copy";
+        boton.textContent = "COPIAR";
+
+        boton.onclick = async () => {
+            try{
+                await navigator.clipboard.writeText(m.texto);
+                boton.textContent = "✓ COPIADO";
+                boton.classList.add("done");
+
+                setTimeout(() => {
+                    boton.textContent = "COPIAR";
+                    boton.classList.remove("done");
+                },1500);
+            }catch(e){
+                alert("No se pudo copiar automáticamente.");
+            }
+        };
+
+        card.appendChild(contenido);
+        card.appendChild(boton);
+        contenedor.appendChild(card);
+    });
+}
+
+function escapeHTML(text){
+    const div=document.createElement("div");
+    div.textContent=text;
+    return div.innerHTML;
+}
+
+document.querySelectorAll(".categories button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        document.querySelectorAll(".categories button")
+            .forEach(b=>b.classList.remove("active"));
+
+        btn.classList.add("active");
+        categoriaActual=btn.dataset.cat;
+        mostrarMensajes();
+    });
+});
+
+buscador.addEventListener("input",mostrarMensajes);
+mostrarMensajes();
+</script>
+
+</body>
+</html>
